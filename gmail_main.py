@@ -307,11 +307,14 @@ def gmail_webhook():
             if not service:
                 return "SERVICE_ERROR", 500
 
-            # Fetch unread emails
+            # Fetch recent unread emails only
+            from datetime import datetime, timedelta
+            yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y/%m/%d")
+
             results = service.users().messages().list(
                 userId="me",
                 labelIds=["INBOX"],
-                q="is:unread"
+                q=f"is:unread after:{yesterday}"
             ).execute()
 
             messages = results.get("messages", [])
@@ -344,10 +347,14 @@ def gmail_poll():
         if not service:
             return jsonify({"error": "Gmail auth failed"}), 500
 
+        # Only fetch emails from last 24 hours
+        from datetime import datetime, timedelta
+        yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y/%m/%d")
+
         results = service.users().messages().list(
             userId="me",
             labelIds=["INBOX"],
-            q="is:unread"
+            q=f"is:unread after:{yesterday}"
         ).execute()
 
         messages = results.get("messages", [])
