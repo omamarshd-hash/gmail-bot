@@ -250,12 +250,7 @@ def process_email(service, message_id):
             service=service,
             to=sender_email,
             subject=f"Re: {subject}",
-            message_text=(
-                f"Hello,\n\n"
-                f"{reply_text}\n\n"
-                f"Best regards,\n"
-                f"Executive Assistant"
-            ),
+            message_text=f"Hello,\n\n{reply_text}",
             thread_id=thread_id
         )
 
