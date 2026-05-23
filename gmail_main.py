@@ -9,6 +9,8 @@ import requests
 import os
 import re
 import json
+import threading
+import time
 from dotenv import load_dotenv
 
 # =========================================
@@ -438,8 +440,47 @@ def setup_push():
 
 
 # =========================================
+# AUTO POLL SCHEDULER
+# Automatically checks for new emails every 5 minutes
+# =========================================
+
+def auto_poll():
+    print("✅ Auto-poll scheduler started")
+    while True:
+        time.sleep(300)  # every 5 minutes
+        try:
+            print("\n⏰ AUTO POLL TRIGGERED")
+            service = get_gmail_service()
+            if not service:
+                print("❌ Auto-poll: Gmail auth failed")
+                continue
+
+            from datetime import datetime, timedelta
+            yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y/%m/%d")
+
+            results = service.users().messages().list(
+                userId="me",
+                labelIds=["INBOX"],
+                q=f"is:unread after:{yesterday}"
+            ).execute()
+
+            messages = results.get("messages", [])
+            print(f"📬 Auto-poll found {len(messages)} unread emails")
+
+            for msg in messages:
+                process_email(service, msg["id"])
+
+        except Exception as e:
+            print(f"❌ Auto-poll error: {str(e)}")
+
+
+# =========================================
 # START SERVER
 # =========================================
+
+# Start auto-poll thread
+poll_thread = threading.Thread(target=auto_poll, daemon=True)
+poll_thread.start()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
