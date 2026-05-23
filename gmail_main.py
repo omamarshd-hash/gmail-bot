@@ -128,11 +128,24 @@ def get_email_body(payload):
 BLOCKED_SENDERS = [
     "no-reply", "noreply", "donotreply",
     "do-not-reply", "mailer-daemon",
-    "notifications", "notification"
+    "notifications", "notification",
+    "render.com", "onrender.com",
+    "groq.com", "github.com",
+    "google.com", "googleapis.com",
+    "accounts.google", "meta.com",
+    "facebook.com", "instagram.com",
+    "support@", "admin@", "billing@",
+    "security@", "alert@", "team@",
+    "newsletter", "digest", "weekly",
+    "automated", "system", "daemon"
 ]
 
 BULK_KEYWORDS = [
-    "unsubscribe", "list-unsubscribe", "mailing list"
+    "unsubscribe", "list-unsubscribe", "mailing list",
+    "this is an automated", "do not reply",
+    "automatically generated", "auto-generated",
+    "deployment", "build failed", "build successful",
+    "your account", "verify your", "click here to"
 ]
 
 
