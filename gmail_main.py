@@ -153,12 +153,22 @@ BULK_KEYWORDS = [
 # ASK GOVERNOR AI
 # =========================================
 
-def ask_governor(sender_email, email_body):
+def wake_governor():
+    try:
+        base_url = GOVERNOR_URL.replace("/process_message", "")
+        requests.get(base_url, timeout=10)
+        print("✅ Governor is awake")
+    except:
+        pass
+
+
+def ask_governor(sender_email, email_body, user_email=None):
     try:
         payload = {
             "platform": "gmail",
             "user_id": sender_email,
-            "message": email_body
+            "message": email_body,
+            "user_email": user_email or sender_email
         }
 
         response = requests.post(
@@ -239,8 +249,11 @@ def process_email(service, message_id):
         email_match = re.search(r'<(.+?)>', sender)
         sender_email = email_match.group(1) if email_match else sender
 
-        # Ask Governor AI
-        reply_text = ask_governor(sender_email, email_body)
+        # Wake Governor first
+        wake_governor()
+
+        # Ask Governor AI — pass sender email so no need to ask
+        reply_text = ask_governor(sender_email, email_body, sender_email)
 
         print("\n🤖 AI REPLY:")
         print(reply_text)
