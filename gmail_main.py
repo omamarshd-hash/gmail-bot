@@ -139,7 +139,20 @@ BLOCKED_SENDERS = [
     "support@", "admin@", "billing@",
     "security@", "alert@", "team@",
     "newsletter", "digest", "weekly",
-    "automated", "system", "daemon"
+    "automated", "system", "daemon",
+    # Education platforms
+    "canvas", "instructure.com", "canvaslms",
+    "blackboard", "moodle", "coursera",
+    "udemy", "edx", "skillshare",
+    # Common automated services
+    "postmaster", "bounce", "autoresponder",
+    "helpdesk", "jira", "confluence",
+    "slack", "trello", "asana",
+    "linkedin", "twitter", "youtube",
+    "amazon", "paypal", "stripe",
+    "info@", "contact@", "hello@",
+    "marketing@", "sales@", "updates@",
+    "news@", "mail@", "email@",
 ]
 
 BULK_KEYWORDS = [
@@ -147,7 +160,12 @@ BULK_KEYWORDS = [
     "this is an automated", "do not reply",
     "automatically generated", "auto-generated",
     "deployment", "build failed", "build successful",
-    "your account", "verify your", "click here to"
+    "your account", "verify your", "click here to",
+    "you are receiving this", "manage your preferences",
+    "email preferences", "opt out", "privacy policy",
+    "terms of service", "view in browser",
+    "course announcement", "assignment submission",
+    "grade posted", "new announcement", "course update",
 ]
 
 
@@ -234,6 +252,20 @@ def process_email(service, message_id):
         sender_lower = sender.lower()
         if any(blocked in sender_lower for blocked in BLOCKED_SENDERS):
             print("🚫 SKIPPING NO-REPLY EMAIL")
+            processed_emails.add(message_id)
+            return
+
+        # Block automated subjects
+        subject_lower = subject.lower()
+        blocked_subjects = [
+            "announcement", "grade", "submission", "assignment",
+            "course", "notification", "alert", "verify", "confirm",
+            "invoice", "receipt", "order", "shipped", "delivery",
+            "password reset", "sign in", "login", "security code",
+            "otp", "one-time", "verification code"
+        ]
+        if any(bs in subject_lower for bs in blocked_subjects):
+            print(f"🚫 SKIPPING AUTOMATED SUBJECT: {subject}")
             processed_emails.add(message_id)
             return
 
